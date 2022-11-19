@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/layout :: head"><title th:text="${title}"></title></head>
+
+<body>
+
+<header th:replace="layout/layout :: header"></header>
+
+
+<div class="container mt-4">
+    <div class="col-md-8 order-md-1">
+        <h4 th:text="${title}" class="mb-3 text-primary"></h4>
+
+        <!--        muestra los msj de error arriba-->
+        <div th:object="${client}" th:remove="tag">
+            <ul th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                <li th:each="err: ${#fields.errors('*')}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+        <form th:action="@{/form}" th:object="${client}" class="needs-validation" method="post"
+              enctype="multipart/form-data">
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" th:field="*{name}"
+                           th:errorclass="'form-control alert-danger'">
+                    <div class="text-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="first_name">First name</label>
+                    <input type="text" class="form-control" id="first_name" th:field="*{first_name}"
+                           th:errorclass="'form-control alert-danger'">
+                    <div class="text-error" th:if="${#fields.hasErrors('first_name')}" th:errors="*{first_name}"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="email">Email</label>
+                    <input type="text" class="form-control" id="email" th:field="*{email}"
+                           placeholder="you@example.com" th:errorclass="'form-control alert-danger'">
+                    <div class="text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="fecha">Fecha</label>
+                    <input type="text" id="fecha" class="form-control" th:field="*{createAt}"
+                           placeholder="yyyy/MM/dd" th:errorclass="'form-control alert-danger'">
+                    <div class="text-error" th:if="${#fields.hasErrors('createAt')}" th:errors="*{createAt}"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-group mb-3">
+                    <label for="file">Choose a profile picture:</label>
+                    <input type="file" id="file" name="file">
+                </div>
+            </div>
+
+            <hr class="mb-4">
+
+            <button class="btn btn-primary" type="submit">crear</button>
+
+            <!--ves de usar este input hidden podemos usar @sessionAtributes en el controller es recomendado-->
+            <!--<input type="hidden" th:field="*{id}">-->
+        </form>
+    </div>
+</div>
+
+<footer th:replace="layout/layout :: footer"></footer>
+</body>
+</html>
+
+
+<!--enctype="multipart/form-data".- permitir el envío de archivos a través de un formulario
+-->

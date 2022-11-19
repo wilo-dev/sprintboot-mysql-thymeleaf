@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<script type="text/javascript" th:fragment="javascript">
+    $(document).ready(function () {
+
+        $("#search").autocomplete({
+            // se encarga de realizar la peticion ajax
+            source: function (request, response) {
+                $.ajax({
+                    url: "/factura/load-product/" + request.term,
+                    dataType: "json",
+                    data: {
+                        term: request.term
+                    },
+                    // recibe los datos en formato json y se lo pasa al autocomple
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                value: item.id,
+                                label: item.name,
+                                precio: item.precio,
+                            };
+                        }));
+                    },
+                });
+            },
+            // se encarga de procesar los datos
+            select: function (event, ui) {
+                // $("#search").val(ui.item.label);
+
+                // si  existe el producto
+                if (itemsHelper.hasProduct(ui.item.value)) {
+                    itemsHelper.incrementCantidad(ui.item.value, ui.item.precio)
+                    return false
+                }
+
+                var replaceTagHtml = $("#plantillaItemsFactura").html()
+                replaceTagHtml = replaceTagHtml.replace(/{ID}/g, ui.item.value)
+                replaceTagHtml = replaceTagHtml.replace(/{NAME}/g, ui.item.label)
+                replaceTagHtml = replaceTagHtml.replace(/{PRECIO}/g, ui.item.precio)
+
+
+                $("#loadItemProduct tbody").append(replaceTagHtml)
+                itemsHelper.calcularImport(ui.item.value, ui.item.precio, 1)
+
+                return false;
+            }
+        });
+        // sacamos la plantilla detalles factura del cliente
+        $("form").submit(function () {
+            $('#plantillaItemsFactura').remove()
+        })
+    });
+
+    // calcular  el subtotal del detalle de la factura
+    var itemsHelper = {
+
+        calcularImport: function (id, precio, cantidad) {
+            $("#valor_product_" + id).html(parseFloat(precio) * parseFloat(cantidad));
+            this.subtotal()
+            this.iva()
+            this.total()
+        },
+
+        // incrementando cantidad de un producto existente
+        hasProduct: function (id) {
+            var result = false;
+
+            $('input[name="item_id[]"]').each(function () {
+                if (parseFloat(id) === parseFloat($(this).val())) {
+                    result = true
+                }
+            })
+            return result
+        },
+        incrementCantidad: function (id, precio) {
+            var cantidad = $("#cantidad_" + id).val() ? parseFloat($("#cantidad_" + id).val()) : 0;
+            $("#cantidad_" + id).val(++cantidad);
+            this.calcularImport(id, precio, cantidad)
+        },
+        delete: function (id) {
+            $("#row_" + id).remove();
+            this.subtotal()
+            this.iva()
+            this.total()
+        },
+        subtotal: function () {
+            var subtotal = 0
+            $('span[id^="valor_product_"]').each(function () {
+                subtotal += parseFloat($(this).html())
+            })
+            $("#subtotal").html(subtotal)
+            return subtotal
+        },
+        iva: function () {
+            var iva = 0.12
+            var result = this.subtotal() * iva
+            $("#iva").html(result)
+            return result
+        },
+        total: function () {
+            var total = 0
+            total = this.subtotal() + this.iva()
+            var result = "$" + total.toFixed(2)
+            $("#total_apagar").html(result)
+        }
+
+    }
+</script>
+
+</body>
+</html>
+

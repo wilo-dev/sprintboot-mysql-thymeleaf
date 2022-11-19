@@ -1,0 +1,16 @@
+package com.wilo.springbootjpamysql.app.models.services.facturaService;
+
+import com.wilo.springbootjpamysql.app.models.entity.Factura;
+import com.wilo.springbootjpamysql.app.models.entity.Product;
+
+import java.awt.*;
+
+public interface IFacturaService {
+
+    // save
+    public void save(Factura factura);
+
+    // buscar producto por id
+    public Product findProductById(Long id);
+
+}
