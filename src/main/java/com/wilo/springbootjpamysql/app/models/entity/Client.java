@@ -102,5 +102,10 @@ public class Client implements Serializable {
     public void addFactura(Factura factura) {
         facturas.add(factura);
     }
+
+    @Override
+    public String toString() {
+        return name + " " + first_name;
+    }
 }
 

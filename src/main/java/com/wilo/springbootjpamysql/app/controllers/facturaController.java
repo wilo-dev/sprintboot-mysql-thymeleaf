@@ -120,7 +120,7 @@ public class facturaController {
     }
 
 
-     /*
+   /*
    ================================================================================
                                        SEARCH
    ================================================================================
@@ -129,6 +129,28 @@ public class facturaController {
     @GetMapping(value = "/load-product/{term}", produces = {"application/json"})
     public @ResponseBody List<Product> loadProduct(@PathVariable String term) {
         return productService.findProductByName(term);
+    }
+
+   /*
+   ================================================================================
+                                       show invoice by id
+   ================================================================================
+   **/
+
+    @GetMapping("/ver/{id}")
+    public String List(@PathVariable("id") Long id, Model model,
+                       RedirectAttributes flash) {
+
+        Factura factura = facturaService.findFacturaById(id);
+
+        // verify that the invoice exists
+        if (factura == null) {
+            flash.addFlashAttribute("error", "La factura no existe en la DB");
+            return "redirect:/list";
+        }
+        model.addAttribute("factura", factura);
+        model.addAttribute("title", "Invoice detail ".concat(factura.getDescription()));
+        return "factura/ver";
     }
 }
 

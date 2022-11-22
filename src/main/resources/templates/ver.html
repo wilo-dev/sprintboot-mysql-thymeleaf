@@ -35,6 +35,8 @@
                     <th>Descripcion</th>
                     <th>Fecha</th>
                     <th>total</th>
+                    <th>Ver</th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -43,6 +45,9 @@
                     <td th:text="${factura.description}"></td>
                     <td th:text="${factura.createAt}"></td>
                     <td th:text="${factura.total}"></td>
+                    <td><a class="btn btn-primary btn-xs"
+                           th:href="@{'/factura/ver/' + ${factura.id}}"
+                           th:text="'Detalle'"></a></td>
                 </tr>
                 </tbody>
             </table>

@@ -13,4 +13,7 @@ public interface IFacturaService {
     // buscar producto por id
     public Product findProductById(Long id);
 
+    // ver la factura
+    public Factura findFacturaById(Long id);
+
 }
