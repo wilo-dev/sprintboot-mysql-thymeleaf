@@ -106,15 +106,34 @@ public class Factura implements Serializable {
         items.add(item);
     }
 
-    public Double getTotal() {
-        Double total = 0.0;
+    public Double getRoundTwoDecimal(Double valor) {
+        return Math.round(valor * 100.0) / 100.0;
+    }
+
+    public Double getSubtotal() {
+        Double cantidad = 0.0;
+        Double subtotal = 0.0;
 
         int size = items.size();
 
         for (int i = 0; i < size; i++) {
-            total += items.get(i).calcularImporte();
+            cantidad += items.get(i).calcularImporte();
+//            subtotal = Math.round(cantidad * 100.0) / 100.0;
+            subtotal = getRoundTwoDecimal(cantidad);
         }
 
+        return subtotal;
+    }
+
+    public Double getIva() {
+        Double iva = 0.0;
+        iva = getRoundTwoDecimal(getSubtotal() * 0.12);
+        return iva;
+    }
+
+    public Double getTotal() {
+        Double total = 0.0;
+        total = getRoundTwoDecimal(getSubtotal() + getIva());
         return total;
     }
 

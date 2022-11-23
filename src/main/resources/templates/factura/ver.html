@@ -23,6 +23,62 @@
                 <li class="list-group-item" th:text="'Descripcion: ' + ${factura.description}"></li>
                 <li class="list-group-item" th:text="'Fecha: ' + ${factura.createAt}"></li>
             </ul>
+            <div class="alert alert-info my-4" th:if="${#lists.isEmpty(factura.items)}"
+                 th:text="'here not invoice' + ${factura.description}"></div>
+
+            <table th:if="${not #lists.isEmpty(factura.items)}"
+                   class="table table-striped table-hover table-bordered my-3">
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="linea: ${factura.items}">
+                    <td th:text="${linea.product.name}"></td>
+                    <td th:text="${linea.product.precio}"></td>
+                    <td th:text="${linea.cantidad}"></td>
+                    <td th:text="${linea.calcularImporte()}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-end">
+                <div class="row">
+                    <h5 class="col font-weight-bold">Subtotal =</h5>
+                    <span th:text="${factura.subtotal}"></span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <div class="row">
+                    <h5 class="col font-weight-bold">Iva =</h5>
+                    <span th:text="${factura.iva}"></span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <div class="row">
+                    <h5 class="col font-weight-bold">Total a pagar = </h5>
+                    <span th:text="${factura.total}"></span>
+                </div>
+            </div>
+
+            <div class="card border-info mb-4" style="max-width: 20rem;">
+                <div class="card-header">Oservaciones</div>
+                <div class="card-body">
+                    <p class="card-text" th:text="${factura.observacion}"
+                       th:if="${not #strings.isEmpty(factura.observacion)}"></p>
+                    <h4 class="card-title"
+                        th:if="${#strings.isEmpty(factura.observacion)}"
+                        th:text="'You havent observation'"></h4>
+                </div>
+            </div>
+
+            <h4 class="card-title">
+                <a th:href="@{'/ver/' + ${factura.client.id}}" class="btn btn-primary btn-xs">&laquo; Black</a>
+            </h4>
+
         </div>
     </div>
 </div>
@@ -31,3 +87,4 @@
 <footer th:replace="layout/layout :: footer"></footer>
 </body>
 </html>
+
