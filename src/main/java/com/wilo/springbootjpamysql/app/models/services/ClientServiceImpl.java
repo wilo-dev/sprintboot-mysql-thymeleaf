@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service("iClientService")
-public class ClientServiceImpl implements IClientService{
+public class ClientServiceImpl implements IClientService {
 
     @Autowired
     private IClientDao clientDao;
@@ -46,4 +46,12 @@ public class ClientServiceImpl implements IClientService{
     public void delete(Long id) {
         clientDao.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Client fetchByIdWithFactura(Long id) {
+        return clientDao.fetchByIdWithFactura(id);
+    }
+
+
 }

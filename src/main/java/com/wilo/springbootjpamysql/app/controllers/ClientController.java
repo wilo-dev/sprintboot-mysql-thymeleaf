@@ -30,6 +30,8 @@ import java.util.Map;
 @Controller("clientController")
 @SessionAttributes("client")
 public class ClientController {
+
+
     @Autowired
     private IClientService clientService;
 
@@ -45,9 +47,12 @@ public class ClientController {
     @GetMapping("/uploads/{filename:.+}")
     public ResponseEntity<UrlResource> seePhoto(@PathVariable String filename) {
 
+
         UrlResource resource = null;
         try {
             resource = uploadsService.getImg(filename);
+
+
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -65,8 +70,10 @@ public class ClientController {
     public String ver(@PathVariable("id") Long id, Map<String, Object> model,
                       RedirectAttributes flash) {
 
+//        Client client = clientService.findById(id);
+        Client client = clientService.fetchByIdWithFactura(id);
+
         // validar si existe client
-        Client client = clientService.findById(id);
         if (client == null) {
             flash.addFlashAttribute("error", "El cliente no existe en la DB ");
             return "redirect:/list";
@@ -197,9 +204,9 @@ public class ClientController {
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") Long id, RedirectAttributes flash) {
 
-        if (id > 0) {
-            Client client = clientService.findById(id);
+        Client client = clientService.findById(id);
 
+        if (id > 0) {
             clientService.delete(id);
             flash.addFlashAttribute("success", "Cliente eliminado con exito");
 

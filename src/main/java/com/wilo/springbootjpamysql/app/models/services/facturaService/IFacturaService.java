@@ -16,4 +16,10 @@ public interface IFacturaService {
     // ver la factura
     public Factura findFacturaById(Long id);
 
+    // eiminar factura
+    public void deleteFactura(Long id);
+
+    // Viene todas las relaciones de una
+    public Factura fetchFacturaByIdWithClientWithItemWithProduct(Long id);
+
 }

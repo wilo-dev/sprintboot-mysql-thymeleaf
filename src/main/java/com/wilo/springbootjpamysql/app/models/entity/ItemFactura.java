@@ -14,6 +14,7 @@ public class ItemFactura implements Serializable {
     private Integer cantidad;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private Product product;
 
     public Long getId() {
@@ -51,3 +52,4 @@ public class ItemFactura implements Serializable {
 /*
 Items de productos no "facturas de items"
 **/
+

@@ -25,5 +25,8 @@ public interface IClientService {
     // delete
     public void delete(Long id);
 
+    // mostrar de una la consulta
+    public Client fetchByIdWithFactura(Long id);
+
 
 }

@@ -141,7 +141,8 @@ public class facturaController {
     public String List(@PathVariable("id") Long id, Model model,
                        RedirectAttributes flash) {
 
-        Factura factura = facturaService.findFacturaById(id);
+//        Factura factura = facturaService.findFacturaById(id); // trae uno por uno las consultas
+        Factura factura = facturaService.fetchFacturaByIdWithClientWithItemWithProduct(id);
 
         // verify that the invoice exists
         if (factura == null) {
@@ -152,6 +153,27 @@ public class facturaController {
         model.addAttribute("title", "Invoice detail ".concat(factura.getDescription()));
         return "factura/ver";
     }
+
+       /*
+   ================================================================================
+                                      DELETE FACTURA
+   ================================================================================
+   **/
+
+    @GetMapping("/delete/{id}")
+    public String deleteFactura(@PathVariable("id") Long id, RedirectAttributes flash) {
+        Factura factura = facturaService.findFacturaById(id);
+
+        if (factura != null) {
+            facturaService.deleteFactura(id);
+            flash.addFlashAttribute("success", "Factura eliminada con exito");
+            return "redirect:/ver/" + factura.getClient().getId();
+        }
+        flash.addFlashAttribute("error", "La factura no existe");
+        return "redirect:/list";
+    }
+
+
 }
 
 /*
