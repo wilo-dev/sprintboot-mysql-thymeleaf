@@ -1,6 +1,8 @@
 package com.wilo.springbootjpamysql.app.controllers;
 
 
+import com.cloudinary.utils.ObjectUtils;
+import com.wilo.springbootjpamysql.app.helpers.CloudinaryConfig;
 import com.wilo.springbootjpamysql.app.models.entity.Client;
 import com.wilo.springbootjpamysql.app.models.services.IClientService;
 import com.wilo.springbootjpamysql.app.models.services.uploadImg.IUploadsService;
@@ -38,6 +40,9 @@ public class ClientController {
     @Autowired
     private IUploadsService uploadsService;
 
+    @Autowired
+    CloudinaryConfig clouConfig;
+
     /*
   ================================================================================
         Uploads programáticamente en respuesta HTTP(otra manera de subir foto)
@@ -47,11 +52,10 @@ public class ClientController {
     @GetMapping("/uploads/{filename:.+}")
     public ResponseEntity<UrlResource> seePhoto(@PathVariable String filename) {
 
-
         UrlResource resource = null;
+
         try {
             resource = uploadsService.getImg(filename);
-
 
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
@@ -147,7 +151,7 @@ public class ClientController {
 
     /*
  ================================================================================
-                                     SAVE
+     SAVE form Uploading Images CLOUDINARY
  ================================================================================
  ***/
     // validamos el form por cada input con @valid
@@ -165,26 +169,38 @@ public class ClientController {
             return "formulary/form";
         }
 
-        // validar q no sea vacio
+        // validar q no sea vacio (si photo no vien vacio)
         if (!photo.isEmpty()) {
             Path uploads = Path.of("uploads");
+
+            // si existe el client
             if (client.getId() != null
                     && client.getId() > 0
                     && client.getPhoto() != null
                     && client.getPhoto().length() > 0) {
 
+//                se elimina la img del server
                 uploadsService.deleteImg(client.getPhoto());
             }
+
             String uniqueFilename = null;
+            Map uploadResp = null;
             try {
-                uniqueFilename = uploadsService.copy(photo);
+                // change name img and save server
+//                uniqueFilename = uploadsService.copy(photo);
+                uploadResp = clouConfig.uploadImg(photo.getBytes(),
+                        ObjectUtils.asMap(
+                                "folder", "springBoot/actor/",
+                                "resource_type", "auto"));
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
-            flash.addFlashAttribute("info",
-                    "Has subido correctamente la foto '" + uniqueFilename + "'");
-            client.setPhoto(uniqueFilename);
+//            flash.addFlashAttribute("info",
+//                    "Has subido correctamente la foto '" + uniqueFilename + "'");
+//            client.setPhoto(uniqueFilename);
+            client.setPhoto(uploadResp.get("url").toString());
         }
 
         String msjFlash = client.getId() != null ? "Cliente editado con éxito" : "Cliente creado con éxito";
@@ -197,7 +213,7 @@ public class ClientController {
 
     /*
      ================================================================================
-                                         DELETE CLIENT
+                                         DELETE CLIENT WITH IMG
      ================================================================================
      se elimina el client se elimina la photo.
      ***/
@@ -210,6 +226,7 @@ public class ClientController {
             clientService.delete(id);
             flash.addFlashAttribute("success", "Cliente eliminado con exito");
 
+            // delete photo
             if (uploadsService.deleteImg(client.getPhoto())) {
                 flash.addFlashAttribute("info",
                         "foto " + client.getPhoto() + " eliminada con exito");

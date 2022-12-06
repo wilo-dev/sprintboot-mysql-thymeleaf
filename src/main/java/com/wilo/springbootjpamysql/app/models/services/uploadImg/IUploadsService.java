@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 
 public interface IUploadsService {
 
+    // mostrar la img en la vista
     public UrlResource getImg(String filename) throws MalformedURLException;
 
     //remonbra la img

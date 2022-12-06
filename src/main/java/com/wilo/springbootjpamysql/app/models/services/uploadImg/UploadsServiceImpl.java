@@ -44,28 +44,28 @@ public class UploadsServiceImpl implements IUploadsService {
 
     /*
  ================================================================================
-                         RENOMBRANDO IMG
+                  SAVE AND  RENOMBRANDO IMG
  ================================================================================
  ***/
     @Override
     public String copy(MultipartFile file) throws IOException {
         String uniqueFilename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path rootAbsolutPath = getPath(uniqueFilename); // path absoluto
-        log.info("rootAbsolutPath: " + rootAbsolutPath);
+//        log.info("rootAbsolutPath: " + rootAbsolutPath);
         Files.copy(file.getInputStream(), rootAbsolutPath);
         return uniqueFilename;
     }
 
     /*
  ================================================================================
-                         DELETE IMG
+   cada ves q se edita o se elimina un client se elimina la img del servidor
  ================================================================================
  ***/
     @Override
     public boolean deleteImg(String filename) {
-        // eliminar img validar si exist
         Path rootPath = getPath(filename);
         File file = rootPath.toFile();
+        // eliminar img validar si exist
         if (file.exists() && file.canRead()) {
             if (file.delete()) {
                 return true;
@@ -79,11 +79,23 @@ public class UploadsServiceImpl implements IUploadsService {
         FileSystemUtils.deleteRecursively(Paths.get(UPLOADS_FOLDER).toFile());
     }
 
+
+    /*
+================================================================================
+created path in directory server
+================================================================================
+***/
     @Override
     public void createDirectory() throws IOException {
         Files.createDirectory(Paths.get(UPLOADS_FOLDER));
     }
 
+
+    /*
+================================================================================
+get path  directory
+================================================================================
+***/
     public Path getPath(String filename) {
         return Paths.get(UPLOADS_FOLDER).resolve(filename).toAbsolutePath();
     }

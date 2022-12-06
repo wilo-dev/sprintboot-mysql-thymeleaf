@@ -18,29 +18,29 @@ public class SpringBootJpaMysqlApplication implements CommandLineRunner {
     @Autowired
     IUploadsService uploadsService;
 
-    @Value("cloud.name")
-    private String cloudName;
-
-    @Value("api.key")
-    private String apiKey;
-
-    @Value("api.sercret")
-    private String apiSecret;
-
-    @Value("api.environment.variable")
-    private String apiEnv;
-
-    @Bean
-    public Cloudinary cloudinaryConfig() {
-        Cloudinary cloudinary = null;
-        Map<String, Object> config = new HashMap<>();
-        config.put("cloud_name", cloudName);
-        config.put("api_key", apiKey);
-        config.put("api_secret", apiSecret);
-        config.put("api_env", apiEnv);
-        cloudinary = new Cloudinary(config);
-        return cloudinary;
-    }
+//    @Value("cloudName")
+//    private String cloudName;
+//
+//    @Value("apiKey")
+//    private String apiKey;
+//
+//    @Value("apiSecret")
+//    private String apiSecret;
+//
+//    @Value("apiEnvironmentVariable")
+//    private String apiEnv;
+//
+//    @Bean
+//    public Cloudinary cloudinaryConfig() {
+//        Cloudinary cloudinary = null;
+//        Map<String, Object> config = new HashMap<>();
+//        config.put("cloud_name", cloudName);
+//        config.put("api_key", apiKey);
+//        config.put("api_secret", apiSecret);
+//        config.put("api_env", apiEnv);
+//        cloudinary = new Cloudinary(config);
+//        return cloudinary;
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBootJpaMysqlApplication.class, args);
