@@ -49,14 +49,18 @@
                     <label for="fecha">Fecha</label>
                     <input type="text" id="fecha" class="form-control" th:field="*{createAt}"
                            placeholder="yyyy-MM-dd" th:errorclass="'form-control alert-danger'">
-                    <div class="text-error" th:if="${#fields.hasErrors('createAt')}" th:errors="*{createAt}"></div>
+                    <div class="text-error" th:if="${#fields.hasErrors('createAt')}"
+                         th:errors="*{createAt}"></div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="input-group mb-3">
+                <div class=" mb-3">
                     <label for="file">Choose a profile picture:</label>
-                    <input type="file" id="file" name="file">
+                    <input class="form-control-file" type="file" id="file" name="file" accept="image/png, image/jpeg">
+                    <div class="text-error" th:if="${#fields.hasErrors('photo')}" th:errors="*{photo}">
+                        Se requiere una imagen.
+                    </div>
                 </div>
             </div>
 

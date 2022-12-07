@@ -2,6 +2,7 @@ package com.wilo.springbootjpamysql.app.helpers;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Singleton;
+import com.cloudinary.Transformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ public class CloudinaryConfig {
         cloudinary.config.apiKey = key;
     }
 
+    // save claodinary
     public Map uploadImg(Object file, Map options) {
 
         try {
@@ -32,6 +34,16 @@ public class CloudinaryConfig {
             e.printStackTrace();
             return null;
         }
+    }
+
+    // transforma la imagen
+    public String createUrl(String name, int width, int height, String action) {
+        return cloudinary.url()
+                .transformation(new Transformation()
+                        .width(width).height(height)
+                        .border("2px _solid _black").crop(action))
+                .imageTag(name);
+
     }
 
 }

@@ -1,6 +1,7 @@
 package com.wilo.springbootjpamysql.app.controllers;
 
 
+import com.cloudinary.EagerTransformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.wilo.springbootjpamysql.app.helpers.CloudinaryConfig;
 import com.wilo.springbootjpamysql.app.models.entity.Client;
@@ -8,6 +9,8 @@ import com.wilo.springbootjpamysql.app.models.services.IClientService;
 import com.wilo.springbootjpamysql.app.models.services.uploadImg.IUploadsService;
 import com.wilo.springbootjpamysql.app.util.pagination.PageRender;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -23,15 +26,20 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.imageio.ImageIO;
 import javax.validation.Valid;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Map;
 
 @Controller("clientController")
 @SessionAttributes("client")
 public class ClientController {
+
+    private static final Logger log = LoggerFactory.getLogger(ClientController.class);
 
 
     @Autowired
@@ -162,14 +170,13 @@ public class ClientController {
                        RedirectAttributes flash,
                        SessionStatus status) {
 
-
         if (result.hasErrors()) {
             // si falla pasamos el titulo y de forma automatica se pasa el client
             model.addAttribute("title", "Formulario de client");
             return "formulary/form";
         }
 
-        // validar q no sea vacio (si photo no vien vacio)
+        // validar q no sea vacio (si photo no viene vacio)
         if (!photo.isEmpty()) {
             Path uploads = Path.of("uploads");
 
@@ -188,18 +195,21 @@ public class ClientController {
             try {
                 // change name img and save server
 //                uniqueFilename = uploadsService.copy(photo);
+
+                // save cloudinary
                 uploadResp = clouConfig.uploadImg(photo.getBytes(),
                         ObjectUtils.asMap(
                                 "folder", "springBoot/actor/",
                                 "resource_type", "auto"));
-
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
-//            flash.addFlashAttribute("info",
-//                    "Has subido correctamente la foto '" + uniqueFilename + "'");
+            flash.addFlashAttribute("info",
+                    "Has subido correctamente la foto '" + photo.getOriginalFilename() + "'");
 //            client.setPhoto(uniqueFilename);
+
+
             client.setPhoto(uploadResp.get("url").toString());
         }
 
