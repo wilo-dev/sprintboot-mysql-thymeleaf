@@ -24,9 +24,9 @@ import java.util.Map;
 @Controller
 @RequestMapping("/factura")
 @SessionAttributes("factura")
-public class facturaController {
+public class FacturaController {
 
-    private final Logger logger = LoggerFactory.getLogger(facturaController.class);
+    private final Logger logger = LoggerFactory.getLogger(FacturaController.class);
 
 
     @Autowired
