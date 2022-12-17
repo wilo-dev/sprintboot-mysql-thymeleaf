@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="layout/layout :: head"><title th:text="${title}"></title></head>
 
 <body>
@@ -10,7 +11,11 @@
         <div class="card-header" th:text="${title}"></div>
         <div class="card-body">
             <h4 class="card-title">
-                <a class="btn btn-primary" th:href="@{'/factura/form/' + ${client.id}}" th:text="'create factura'"></a>
+                <a sec:authorize="hasRole('ROLE_ADMIN')"
+                   class="btn btn-primary"
+                   th:href="@{'/factura/form/' + ${client.id}}"
+                   th:text="'create factura'">
+                </a>
             </h4>
             <img th:if="${#strings.length(client.photo) > 0}" class="img-thumbnail rounded float-left"
                  style="max-width: 25%;"
@@ -31,15 +36,16 @@
                  th:text=" 'No hay facturas asignados para el cliente '
                  + ${client.name} + ' '
                  + ${client.first_name}"></div>
-            <table th:if="${not #lists.isEmpty(client.facturas)}" class="table table-bordered table-striped my-4">
+            <table th:if="${not #lists.isEmpty(client.facturas)}"
+                   class="table table-bordered table-striped my-4">
                 <thead class="thead-dark">
                 <tr>
                     <th>Folio</th>
                     <th>Descripcion</th>
                     <th>Fecha</th>
                     <th>total</th>
-                    <th>Ver</th>
-                    <th>Delete</th>
+                    <th sec:authorize="hasRole('ROLE_ADMIN')">Ver</th>
+                    <th sec:authorize="hasRole('ROLE_ADMIN')">Delete</th>
 
                 </tr>
                 </thead>
@@ -49,13 +55,13 @@
                     <td th:text="${factura.description}"></td>
                     <td th:text="${factura.createAt}"></td>
                     <td th:text="${factura.total}"></td>
-                    <td>
+                    <td sec:authorize="hasRole('ROLE_ADMIN')">
                         <a class="btn btn-primary btn-sm"
                            th:href="@{'/factura/ver/' + ${factura.id}}"
                            th:text="'Detalle'">
                         </a>
                     </td>
-                    <td>
+                    <td sec:authorize="hasRole('ROLE_ADMIN')">
                         <a class="btn btn-danger btn-sm"
                            th:href="@{'/factura/delete/' + ${factura.id}}"
                            th:text="'Delete'"
