@@ -10,6 +10,7 @@ import com.wilo.springbootjpamysql.app.models.services.productService.IProductSe
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@Secured("ROLE_USER")
 @RequestMapping("/factura")
 @SessionAttributes("factura")
 public class FacturaController {
@@ -39,12 +41,11 @@ public class FacturaController {
     private IFacturaService facturaService;
 
 
-      /*
-   ================================================================================
-                                       CREATE
-   ================================================================================
-   ***/
-
+    /*
+ ================================================================================
+                                     CREATE
+ ================================================================================
+ ***/
     @GetMapping("/form/{clientId}")
     public String create(@PathVariable(value = "clientId") Long clientId,
                          Map<String, Object> model, RedirectAttributes flash) {
@@ -65,12 +66,11 @@ public class FacturaController {
     }
 
 
-   /*
-   ================================================================================
-                                       SAVE ARRAY
-   ================================================================================
-   **/
-
+    /*
+    ================================================================================
+                                        SAVE ARRAY
+    ================================================================================
+    **/
     //    @PostMapping("/factura/form/{id}")
     @PostMapping("/form")
     public String save(@Valid Factura factura,

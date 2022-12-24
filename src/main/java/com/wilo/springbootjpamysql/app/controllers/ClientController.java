@@ -1,7 +1,6 @@
 package com.wilo.springbootjpamysql.app.controllers;
 
 
-import com.cloudinary.EagerTransformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.wilo.springbootjpamysql.app.helpers.CloudinaryConfig;
 import com.wilo.springbootjpamysql.app.models.entity.Client;
@@ -18,11 +17,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -64,6 +67,7 @@ public class ClientController {
         see: https://www.baeldung.com/spring-mvc-pathvariable-dot
   ================================================================================
   ***/
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/uploads/{filename:.+}")
     public ResponseEntity<UrlResource> seePhoto(@PathVariable String filename) {
 
@@ -85,6 +89,8 @@ public class ClientController {
                             Mostrar la img en la vista
     ================================================================================
     ***/
+    @Secured("ROLE_USER")
+    @PreAuthorize("hasRole('ROLE_USER')") // otra manera de seguridad
     @GetMapping("/ver/{id}")
     public String ver(@PathVariable("id") Long id, Map<String, Object> model,
                       RedirectAttributes flash) {
@@ -111,7 +117,7 @@ public class ClientController {
    ***/
     @GetMapping({"/", "/list"})
     public String list(@RequestParam(name = "page", defaultValue = "0") int page,
-                       Model model, Authentication authentication) {
+                       Model model, Authentication authentication, HttpServletRequest request) {
         /*
         En vez de pasar el Authentication por argumento al metodo handler, inyectando el
         Authentication.
@@ -119,24 +125,41 @@ public class ClientController {
         parte de la aplicacion
         **/
 
-        // validamos q este utenticado
+        // verificamos la autorizacion del rol
         if (authentication != null) {
             log.info("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
         }
 
-        // metodo estatica
+        // verificamos la autorizacion del rol, metodo estatica
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             log.info("Utilizando de forma estatica, Hola usuario autenticado, tu username es: ".concat(auth.getName()));
         }
 
+        // metodo_1, validar el rol, de forma manual
         if (hasRole("ROLE_ADMIN")) {
             assert auth != null;
-            log.info("Hola ".concat(auth.getName().concat(" tienes acceso!")));
+            log.info("usando hasRole de forma manual, Hola ".concat(auth.getName().concat(" tienes acceso!")));
         } else {
             assert auth != null;
-            log.info("Hola ".concat(auth.getName().concat(" no tienes acceso! de super usuario")));
+            log.info("usando hasRole de forma manual, Hola ".concat(auth.getName().concat(" no tienes acceso! de super usuario")));
         }
+
+        // metodo_2, validar el rol, usando SecurityContextHolderAwareRequestWrapper
+        SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request, "");
+        if (securityContext.isUserInRole("ROLE_ADMIN")) {
+            log.info("usando SecurityContextHolderAwareRequestWrapper, Hola ".concat(auth.getName().concat(" tienes acceso!")));
+        } else {
+            log.info("usando SecurityContextHolderAwareRequestWrapper, Hola ".concat(auth.getName().concat(" no tienes acceso! de super usuario")));
+        }
+
+        // metodo_3, validar el rol, forma nativa usando HttpServletRequest
+        if (request.isUserInRole("ROLE_ADMIN")) {
+            log.info("usando el HttpServletRequest, Hola ".concat(auth.getName().concat(" tienes acceso!")));
+        } else {
+            log.info("usando el HttpServletRequest, Hola ".concat(auth.getName().concat(" no tienes acceso! de super usuario")));
+        }
+
 
         // paginacion
         Pageable pageRequest = PageRequest.of(page, 5);
@@ -155,6 +178,7 @@ public class ClientController {
                                        CREATE
    ================================================================================
    ***/
+    @Secured("ROLE_ADMIN")
     @GetMapping({"/form"})
     public String create(Map<String, Object> model) {
 
@@ -170,6 +194,7 @@ public class ClientController {
                                      EDIT
  ================================================================================
  ***/
+    @Secured("ROLE_ADMIN")
     @GetMapping("/form/{id}")
     public String edit(@PathVariable("id") Long id, Map<String, Object> model,
                        RedirectAttributes flash) {
@@ -193,9 +218,10 @@ public class ClientController {
 
     /*
  ================================================================================
-     SAVE form Uploading Images CLOUDINARY
+     SAVE formulary Uploading Images CLOUDINARY
  ================================================================================
  ***/
+    @Secured("ROLE_ADMIN")
     // validamos el form por cada input con @valid
     @PostMapping("/form")
     public String save(@Valid Client client, BindingResult result,
@@ -261,6 +287,7 @@ public class ClientController {
      ================================================================================
      se elimina el client se elimina la photo.
      ***/
+    @Secured("ROLE_ADMIN")
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") Long id, RedirectAttributes flash) {
 
@@ -302,6 +329,7 @@ public class ClientController {
 
         return autCollection.contains(new SimpleGrantedAuthority(role));
 
+        // metodo_1, validar el rol, de forma manual
 //        for (GrantedAuthority authority : autCollection) {
 //            if (role.equals(authority.getAuthority())) {
 //                log.info("Hola usuario ".concat(auth.getName()).concat(" tu role es ".concat(authority.getAuthority())));

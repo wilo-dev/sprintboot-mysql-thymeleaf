@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final LoginSuccessHandler successHandler;
@@ -33,11 +35,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/img/**",
                         "/list").permitAll()
                 // private routes
-                .antMatchers("/ver/**").hasAnyRole("USER")
-                .antMatchers("/uploads/**").hasAnyRole("USER")
-                .antMatchers("/form/**").hasAnyRole("ADMIN")
-                .antMatchers("/delete/**").hasAnyRole("ADMIN")
-                .antMatchers("/factura/**").hasAnyRole("ADMIN")
+                // seguridad a controladores mediante forma programatica
+//                .antMatchers("/ver/**").hasAnyRole("USER")
+//                .antMatchers("/uploads/**").hasAnyRole("USER")
+//                .antMatchers("/form/**").hasAnyRole("ADMIN")
+//                .antMatchers("/delete/**").hasAnyRole("ADMIN")
+//                .antMatchers("/factura/**").hasAnyRole("ADMIN")
+
+                // seguridad a controladores mediante anotaciones
+                // se usa directamente en ele controlador
+
+
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
