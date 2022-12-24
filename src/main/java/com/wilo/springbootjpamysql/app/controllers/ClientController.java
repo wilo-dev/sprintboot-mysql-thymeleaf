@@ -18,6 +18,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,11 +33,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.imageio.ImageIO;
 import javax.validation.Valid;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 @Controller("clientController")
@@ -103,7 +110,34 @@ public class ClientController {
    ================================================================================
    ***/
     @GetMapping({"/", "/list"})
-    public String list(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+    public String list(@RequestParam(name = "page", defaultValue = "0") int page,
+                       Model model, Authentication authentication) {
+        /*
+        En vez de pasar el Authentication por argumento al metodo handler, inyectando el
+        Authentication.
+        tambien podemos usar metodos estatico.- esto permite que se puedad usar en cualquier
+        parte de la aplicacion
+        **/
+
+        // validamos q este utenticado
+        if (authentication != null) {
+            log.info("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
+        }
+
+        // metodo estatica
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            log.info("Utilizando de forma estatica, Hola usuario autenticado, tu username es: ".concat(auth.getName()));
+        }
+
+        if (hasRole("ROLE_ADMIN")) {
+            assert auth != null;
+            log.info("Hola ".concat(auth.getName().concat(" tienes acceso!")));
+        } else {
+            assert auth != null;
+            log.info("Hola ".concat(auth.getName().concat(" no tienes acceso! de super usuario")));
+        }
+
         // paginacion
         Pageable pageRequest = PageRequest.of(page, 5);
         Page<Client> clientPage = clientService.findAll(pageRequest);
@@ -244,5 +278,39 @@ public class ClientController {
         }
         return "redirect:/list";
     }
+
+      /*
+     ================================================================================
+                                         validar roles
+     ================================================================================
+     ***/
+
+    private boolean hasRole(String role) {
+
+        SecurityContext contextHolder = SecurityContextHolder.getContext();
+        if (contextHolder == null) {
+            return false;
+        }
+
+        Authentication auth = contextHolder.getAuthentication();
+        if (auth == null) {
+            return false;
+        }
+
+//         todo role tiene que pasar por aqui
+        Collection<? extends GrantedAuthority> autCollection = auth.getAuthorities();
+
+        return autCollection.contains(new SimpleGrantedAuthority(role));
+
+//        for (GrantedAuthority authority : autCollection) {
+//            if (role.equals(authority.getAuthority())) {
+//                log.info("Hola usuario ".concat(auth.getName()).concat(" tu role es ".concat(authority.getAuthority())));
+//                return true;
+//            }
+//        }
+//        return false;
+
+    }
 }
+
 
