@@ -34,7 +34,10 @@ public class Client implements Serializable {
 
     private String photo;
 
-    // un cliente puede tener mucha facturas
+    /*
+    creando la relacion de client a factura
+    un cliente puede tener mucha facturas
+    */
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Factura> facturas;
 
