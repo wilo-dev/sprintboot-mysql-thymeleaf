@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
@@ -27,6 +29,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private DataSource dataSource;
 
 
     @Override
@@ -69,12 +74,20 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder builder) throws Exception {
 
-        PasswordEncoder encoder = this.passwordEncoder;
-        UserBuilder users = User.builder().passwordEncoder(encoder::encode);
+        // configuration JDBC authentication
+        builder.jdbcAuthentication()
+                .dataSource(dataSource)
+                .passwordEncoder(passwordEncoder)
+                .usersByUsernameQuery("select username, password, enable from users where username=?") // uso de sql nativa
+                .authoritiesByUsernameQuery("select u.username, r.rol from roles r inner join users u on (r.user_id=u.id) where u.username=?");
 
-        builder.inMemoryAuthentication()
-                .withUser(users.username("admin").password("123456").roles("ADMIN", "USER"))
-                .withUser(users.username("william").password("123456").roles("USER"));
+        // memoria de autenticacion
+//        PasswordEncoder encoder = this.passwordEncoder;
+//        UserBuilder users = User.builder().passwordEncoder(encoder::encode);
+//
+//        builder.inMemoryAuthentication()
+//                .withUser(users.username("admin").password("123456").roles("ADMIN", "USER"))
+//                .withUser(users.username("william").password("123456").roles("USER"));
     }
 }
 

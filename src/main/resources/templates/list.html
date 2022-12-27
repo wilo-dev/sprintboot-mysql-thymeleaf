@@ -26,7 +26,7 @@
             <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">create factura</th>
             <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">Edit</th>
             <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">Delete</th>
-            <th sec:authorize="hasRole('ROLE_ADMIN')" colspan="2" scope="col">Accion</th>
+            <th sec:authorize="hasRole('ROLE_ADMIN')" colspan="2" scope="col">Habilitar</th>
         </tr>
         </thead>
         <tbody>
@@ -41,7 +41,7 @@
             <td th:text="${client.first_name}"></td>
             <td th:text="${client.email}"></td>
             <td th:text="${client.createAt}"></td>
-            <td sec:authorize="hasRole('ROLE_USER')">
+            <td sec:authorize="hasRole('ROLE_ADMIN')">
                 <a class="btn btn-success" th:href="@{'/factura/form/' + ${client.id}}"
                    th:text="'create factura'">
                 </a>
