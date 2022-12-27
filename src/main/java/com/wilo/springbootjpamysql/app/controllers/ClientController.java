@@ -33,15 +33,11 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -324,7 +320,7 @@ public class ClientController {
             return false;
         }
 
-//         todo role tiene que pasar por aqui
+//         todos los role tiene que pasar por aqui
         Collection<? extends GrantedAuthority> autCollection = auth.getAuthorities();
 
         return autCollection.contains(new SimpleGrantedAuthority(role));
