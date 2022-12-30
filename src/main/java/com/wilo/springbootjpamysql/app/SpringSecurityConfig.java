@@ -1,6 +1,7 @@
 package com.wilo.springbootjpamysql.app;
 
 import com.wilo.springbootjpamysql.app.auth.handler.LoginSuccessHandler;
+import com.wilo.springbootjpamysql.app.models.services.userService.JpaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -30,8 +31,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+//    @Autowired
+//    private DataSource dataSource;
+
     @Autowired
-    private DataSource dataSource;
+    private JpaUserDetailsService userDetailsService;
 
 
     @Override
@@ -75,11 +79,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(AuthenticationManagerBuilder builder) throws Exception {
 
         // configuration JDBC authentication
-        builder.jdbcAuthentication()
-                .dataSource(dataSource)
-                .passwordEncoder(passwordEncoder)
-                .usersByUsernameQuery("select username, password, enable from users where username=?") // uso de sql nativa
-                .authoritiesByUsernameQuery("select u.username, r.rol from roles r inner join users u on (r.user_id=u.id) where u.username=?");
+//        builder.jdbcAuthentication()
+//                .dataSource(dataSource)
+//                .passwordEncoder(passwordEncoder)
+//                .usersByUsernameQuery("select username, password, enable from users where username=?") // consulta sql nativa
+//                .authoritiesByUsernameQuery("select u.username, r.rol from roles r inner join users u on (r.user_id=u.id) where u.username=?");
+
+        // configuration JPA authentication
+        // creamos IUserDao
+        builder.userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder);
 
         // memoria de autenticacion
 //        PasswordEncoder encoder = this.passwordEncoder;
@@ -90,4 +99,3 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .withUser(users.username("william").password("123456").roles("USER"));
     }
 }
-
