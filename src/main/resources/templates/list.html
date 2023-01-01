@@ -19,13 +19,13 @@
         <thead class="thead-light">
         <tr>
             <th sec:authorize="hasRole('ROLE_USER')" scope="col">ID</th>
-            <th scope="col">Name</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Date</th>
-            <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">create factura</th>
-            <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">Edit</th>
-            <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">Delete</th>
+            <th th:text="#{text.cliente.nombre}">Nombre</th>
+            <th th:text="#{text.cliente.apellido}">Apellido</th>
+            <th th:text="#{text.cliente.correo}">Correo</th>
+            <th th:text="#{text.cliente.fecha}">Fecha</th>
+            <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">Crear factura</th>
+            <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">Editar</th>
+            <th sec:authorize="hasRole('ROLE_ADMIN')" scope="col">Eliminar</th>
             <th sec:authorize="hasRole('ROLE_ADMIN')" colspan="2" scope="col">Habilitar</th>
         </tr>
         </thead>

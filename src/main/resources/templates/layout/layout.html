@@ -36,7 +36,8 @@
             </ul>
 
             <ul class="navbar-nav navbar-right">
-                <li sec:authorize="!isAuthenticated()"><a class="btn btn-primary" th:href="@{/login}">Sign In</a></li>
+                <li sec:authorize="!isAuthenticated()"><a class="btn btn-primary"
+                                                          th:href="@{/login}">Sign In</a></li>
 
                 <li sec:authorize="isAuthenticated()" class="dropdown">
                     <a class="btn btn-primary dropdown-toggle" href="#" role="button"
@@ -54,6 +55,17 @@
                             </button>
                         </form>
                     </div>
+                </li>
+            </ul>
+            <ul class="navbar-nav navbar-right mx-4">
+                <li class="nav-item mx-1">
+                    <a CLASS="btn btn-outline-success" href="?lang=es_ES">ES</a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a CLASS="btn btn-outline-success" href="?lang=en_US">EN</a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a CLASS="btn btn-outline-success" href="?lang=de_DE">DE</a>
                 </li>
             </ul>
         </div>
