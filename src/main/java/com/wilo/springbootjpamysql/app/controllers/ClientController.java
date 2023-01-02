@@ -11,6 +11,7 @@ import com.wilo.springbootjpamysql.app.util.pagination.PageRender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 
 @Controller("clientController")
@@ -56,6 +58,9 @@ public class ClientController {
 
     @Autowired
     CloudinaryConfig clouConfig;
+
+    @Autowired
+    private MessageSource messageSource;
 
     /*
   ================================================================================
@@ -113,7 +118,8 @@ public class ClientController {
    ***/
     @GetMapping({"/", "/list"})
     public String list(@RequestParam(name = "page", defaultValue = "0") int page,
-                       Model model, Authentication authentication, HttpServletRequest request) {
+                       Model model, Authentication authentication,
+                       HttpServletRequest request, Locale locale) {
         /*
         En vez de pasar el Authentication por argumento al metodo handler, inyectando el
         Authentication.
@@ -162,7 +168,11 @@ public class ClientController {
         Page<Client> clientPage = clientService.findAll(pageRequest);
         PageRender<Client> pageRender = new PageRender<>("/list", clientPage);
 
-        model.addAttribute("title", "Listado de clientes");
+        model.addAttribute("title",
+                messageSource
+                        .getMessage("text.clientController.listar.titulo",
+                                null,
+                                locale));
         model.addAttribute("clients", clientPage);
         model.addAttribute("page", pageRender);
 //        model.addAttribute("clients", clientService.findAll());
