@@ -33,16 +33,16 @@ public class ItemFactura implements Serializable {
         this.cantidad = cantidad;
     }
 
-    public Double calcularImporte() {
-        return cantidad.doubleValue() * product.getPrecio();
-    }
-
     public Product getProduct() {
         return product;
     }
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Double calcularImporte() {
+        return cantidad.doubleValue() * product.getPrecio();
     }
 
     private static final long serialVersionUID = 1L;
