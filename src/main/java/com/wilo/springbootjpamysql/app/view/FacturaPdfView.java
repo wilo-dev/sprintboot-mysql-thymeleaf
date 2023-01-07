@@ -7,16 +7,28 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.wilo.springbootjpamysql.app.models.entity.Factura;
 import com.wilo.springbootjpamysql.app.models.entity.ItemFactura;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.view.document.AbstractPdfView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
+import java.util.Locale;
 import java.util.Map;
 
 @Component("factura/ver")
 public class FacturaPdfView extends AbstractPdfView {
+
+    @Autowired
+    private MessageSource messageSource; // metodo 1 d traduccion
+    @Autowired
+    private LocaleResolver localeResolver; // metodo 1 d traduccion
+
+
     PdfPCell cell = null;
 
     public PdfPCell styleCell(String title, int r, int g, int b) {
@@ -26,7 +38,6 @@ public class FacturaPdfView extends AbstractPdfView {
         return cell;
     }
 
-
     @Override
     protected void buildPdfDocument(Map<String, Object> model,
                                     Document document,
@@ -34,25 +45,32 @@ public class FacturaPdfView extends AbstractPdfView {
                                     HttpServletRequest request,
                                     HttpServletResponse response) throws Exception {
 
-
         Factura factura = (Factura) model.get("factura");
+        Locale locale = localeResolver.resolveLocale(request);
+        MessageSourceAccessor message = getMessageSourceAccessor(); // metodo 2 d traduccion
+
+
+        String title = null;
 
 //         creando el diseño del pdf
         PdfPTable table = new PdfPTable(1);
         table.setSpacingAfter(20);
 
-        table.addCell(styleCell("Datos del cliente", 184, 218, 255));
+        title = messageSource.getMessage("text.detalle.cliente", null, locale);
+        table.addCell(styleCell(title, 184, 218, 255));
         table.addCell("Nombre: " + factura.getClient().getName().concat(factura.getClient().getFirst_name()));
         table.addCell("Correo electrónico: " + factura.getClient().getEmail());
 
 
         PdfPTable table2 = new PdfPTable(1);
-
         table2.setSpacingAfter(20);
-        table2.addCell(styleCell("Datos de la factura", 195, 230, 203));
-        table2.addCell("Folio: #".concat(String.valueOf(factura.getId())));
-        table2.addCell("Descripción: ".concat(factura.getDescription()));
-        table2.addCell("Fecha: " + factura.getCreateAt());
+
+        title = messageSource.getMessage("text.detalle.factura", null, locale);
+        table2.addCell(styleCell(title, 195, 230, 203));
+
+        table2.addCell(message.getMessage("text.detalle.factura.folio") + ": #".concat(String.valueOf(factura.getId())));
+        table2.addCell(message.getMessage("text.detalle.factura.descripcion") + ":".concat(factura.getDescription()));
+        table2.addCell(message.getMessage("text.detalle.factura.fecha") + ":" + factura.getCreateAt());
 
         // guardar
         document.add(table);
@@ -61,10 +79,18 @@ public class FacturaPdfView extends AbstractPdfView {
         PdfPTable table3 = new PdfPTable(4);
         table3.setWidths(new float[]{3.5f, 1, 1, 1});
         table3.setSpacingAfter(20);
-        table3.addCell("Producto");
-        table3.addCell("Precio");
-        table3.addCell("Cantidad");
-        table3.addCell("Total");
+
+        title = messageSource.getMessage("text.detalle.items.producto", null, locale);
+        table3.addCell(title);
+
+        title = messageSource.getMessage("text.detalle.items.precio", null, locale);
+        table3.addCell(title);
+
+        title = messageSource.getMessage("text.detalle.items.cantidad", null, locale);
+        table3.addCell(title);
+
+        title = messageSource.getMessage("text.detalle.items.total", null, locale);
+        table3.addCell(title);
 
         // recorremos cada item
         for (ItemFactura item : factura.getItems()) {
@@ -102,3 +128,4 @@ public class FacturaPdfView extends AbstractPdfView {
     }
 
 }
+//see video 7
