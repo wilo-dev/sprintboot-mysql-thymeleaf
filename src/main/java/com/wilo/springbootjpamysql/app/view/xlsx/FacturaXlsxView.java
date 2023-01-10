@@ -2,10 +2,8 @@ package com.wilo.springbootjpamysql.app.view.xlsx;
 
 import com.wilo.springbootjpamysql.app.models.entity.Factura;
 import com.wilo.springbootjpamysql.app.models.entity.ItemFactura;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.document.AbstractXlsxView;
 
@@ -20,9 +18,10 @@ public class FacturaXlsxView extends AbstractXlsxView {
                                       HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
+        response.setHeader("Content-Disposition", "attachment; filename=\"\factura_view.xlsx\"");
         Factura factura = (Factura) model.get("factura");
-
         Sheet sheet = workbook.createSheet("facturaSpring");
+        MessageSourceAccessor message = getMessageSourceAccessor();
 
   /*
   ================================================================================
@@ -58,6 +57,19 @@ public class FacturaXlsxView extends AbstractXlsxView {
        celda #3 Detalles de la factura
   ================================================================================
   **/
+        CellStyle theraderStyle = workbook.createCellStyle();
+        theraderStyle.setBorderBottom(BorderStyle.MEDIUM);
+        theraderStyle.setBorderTop(BorderStyle.MEDIUM);
+        theraderStyle.setBorderRight(BorderStyle.MEDIUM);
+        theraderStyle.setBorderLeft(BorderStyle.MEDIUM);
+        theraderStyle.setFillForegroundColor(IndexedColors.GOLD.index);
+        theraderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        CellStyle tbodyStyle = workbook.createCellStyle();
+        tbodyStyle.setBorderBottom(BorderStyle.THIN);
+        tbodyStyle.setBorderTop(BorderStyle.THIN);
+        tbodyStyle.setBorderRight(BorderStyle.THIN);
+        tbodyStyle.setBorderLeft(BorderStyle.THIN);
 
         Row header = sheet.createRow(9);
         header.createCell(0).setCellValue("Producto");
@@ -65,26 +77,59 @@ public class FacturaXlsxView extends AbstractXlsxView {
         header.createCell(2).setCellValue("Cantidad");
         header.createCell(3).setCellValue("Total");
 
+        header.getCell(0).setCellStyle(theraderStyle);
+        header.getCell(1).setCellStyle(theraderStyle);
+        header.getCell(2).setCellStyle(theraderStyle);
+        header.getCell(3).setCellStyle(theraderStyle);
+
         int rownum = 10;
         for (ItemFactura item : factura.getItems()) {
             Row file = sheet.createRow(rownum++);
-            file.createCell(0).setCellValue(item.getProduct().getName());
-            file.createCell(1).setCellValue(item.getProduct().getPrecio());
-            file.createCell(2).setCellValue(item.getCantidad());
-            file.createCell(3).setCellValue(item.calcularImporte());
+
+            cell = file.createCell(0);
+            cell.setCellValue(item.getProduct().getName());
+            cell.setCellStyle(tbodyStyle);
+
+            cell = file.createCell(1);
+            cell.setCellValue(item.getProduct().getPrecio());
+            cell.setCellStyle(tbodyStyle);
+
+            cell = file.createCell(2);
+            cell.setCellValue(item.getCantidad());
+            cell.setCellStyle(tbodyStyle);
+
+            cell = file.createCell(3);
+            cell.setCellValue(item.calcularImporte());
+            cell.setCellStyle(tbodyStyle);
         }
-    
+
         Row fileTotal = sheet.createRow(rownum);
-        fileTotal.createCell(2).setCellValue("Subtotal: ");
-        fileTotal.createCell(3).setCellValue(factura.getSubtotal());
+        cell = fileTotal.createCell(2);
+        cell.setCellValue("Subtotal: ");
+        cell.setCellStyle(tbodyStyle);
+
+        cell = fileTotal.createCell(3);
+        cell.setCellValue(factura.getSubtotal());
+        cell.setCellStyle(tbodyStyle);
 
         fileTotal = sheet.createRow(rownum + 1);
-        fileTotal.createCell(2).setCellValue("I.V.A 12%: ");
-        fileTotal.createCell(3).setCellValue(factura.getIva());
+        cell = fileTotal.createCell(2);
+        cell.setCellValue("I.V.A 12%: ");
+        cell.setCellStyle(tbodyStyle);
+
+        cell = fileTotal.createCell(3);
+        cell.setCellValue(factura.getIva());
+        cell.setCellStyle(tbodyStyle);
 
         fileTotal = sheet.createRow(rownum + 2);
-        fileTotal.createCell(2).setCellValue("Total a pagar: ");
-        fileTotal.createCell(3).setCellValue(factura.getTotal());
+        cell = fileTotal.createCell(2);
+        cell.setCellValue("Total a pagar: ");
+        cell.setCellStyle(tbodyStyle);
+
+
+        cell = fileTotal.createCell(3);
+        cell.setCellValue(factura.getTotal());
+        cell.setCellStyle(tbodyStyle);
 
 
     }
