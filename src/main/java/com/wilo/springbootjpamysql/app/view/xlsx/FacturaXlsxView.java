@@ -22,6 +22,8 @@ public class FacturaXlsxView extends AbstractXlsxView {
         Factura factura = (Factura) model.get("factura");
         Sheet sheet = workbook.createSheet("facturaSpring");
         MessageSourceAccessor message = getMessageSourceAccessor();
+        assert message != null;
+
 
   /*
   ================================================================================
@@ -30,7 +32,7 @@ public class FacturaXlsxView extends AbstractXlsxView {
   **/
         Row row = sheet.createRow(0);
         Cell cell = row.createCell(0);
-        cell.setCellValue("Datos del cliente");
+        cell.setCellValue(message.getMessage("text.detalle.cliente"));
 
         row = sheet.createRow(1);
         cell = row.createCell(0);
