@@ -1,4 +1,4 @@
-package com.wilo.springbootjpamysql.app.view;
+package com.wilo.springbootjpamysql.app.view.pdf;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.Phrase;
@@ -29,14 +29,22 @@ public class FacturaPdfView extends AbstractPdfView {
     private LocaleResolver localeResolver; // metodo 1 d traduccion
 
 
-    PdfPCell cell = null;
-
-    public PdfPCell styleCell(String title, int r, int g, int b) {
-        cell = new PdfPCell(new Phrase(title));
+    public PdfPCell headerCell(String title, int r, int g, int b) {
+        PdfPCell cell = new PdfPCell(new Phrase(title));
         cell.setBackgroundColor(new Color(r, g, b));
         cell.setPadding(8f);
         return cell;
     }
+
+    public PdfPCell footerCell(String title, int r, int g, int b, int align) {
+        PdfPCell cell = new PdfPCell(new Phrase(title));
+        cell.setBackgroundColor(new Color(r, g, b));
+        cell.setHorizontalAlignment(align);
+        cell.setColspan(3);
+        cell.setPadding(4f);
+        return cell;
+    }
+
 
     @Override
     protected void buildPdfDocument(Map<String, Object> model,
@@ -50,82 +58,94 @@ public class FacturaPdfView extends AbstractPdfView {
         MessageSourceAccessor message = getMessageSourceAccessor(); // metodo 2 d traduccion
 
 
-        String title = null;
+        String title;
 
-//         creando el diseño del pdf
-        PdfPTable table = new PdfPTable(1);
-        table.setSpacingAfter(20);
+    /*
+  ================================================================================
+       table #1 datos del cliente
+  ================================================================================
+  ***/
+        PdfPTable table1 = new PdfPTable(1);
+        table1.setSpacingAfter(20);
 
         title = messageSource.getMessage("text.detalle.cliente", null, locale);
-        table.addCell(styleCell(title, 184, 218, 255));
-        table.addCell("Nombre: " + factura.getClient().getName().concat(factura.getClient().getFirst_name()));
-        table.addCell("Correo electrónico: " + factura.getClient().getEmail());
+        table1.addCell(headerCell(title, 184, 218, 255));
 
+        table1.addCell("Nombre: " + factura.getClient().getName().concat(factura.getClient().getFirst_name()));
+        table1.addCell("Correo electrónico: " + factura.getClient().getEmail());
 
+    /*
+  ================================================================================
+       table #1 datos de la factura
+  ================================================================================
+  ***/
         PdfPTable table2 = new PdfPTable(1);
         table2.setSpacingAfter(20);
 
         title = messageSource.getMessage("text.detalle.factura", null, locale);
-        table2.addCell(styleCell(title, 195, 230, 203));
+        table2.addCell(headerCell(title, 195, 230, 203));
 
+        assert message != null;
         table2.addCell(message.getMessage("text.detalle.factura.folio") + ": #".concat(String.valueOf(factura.getId())));
-        table2.addCell(message.getMessage("text.detalle.factura.descripcion") + ":".concat(factura.getDescription()));
-        table2.addCell(message.getMessage("text.detalle.factura.fecha") + ":" + factura.getCreateAt());
+        table2.addCell(message.getMessage("text.detalle.factura.descripcion") + ": ".concat(factura.getDescription()));
+        table2.addCell(message.getMessage("text.detalle.factura.fecha") + ": " + factura.getCreateAt());
 
         // guardar
-        document.add(table);
+        document.add(table1);
         document.add(table2);
 
+            /*
+  ================================================================================
+       table #3 Items de la facura
+  ================================================================================
+  ***/
+
         PdfPTable table3 = new PdfPTable(4);
-        table3.setWidths(new float[]{3.5f, 1, 1, 1});
         table3.setSpacingAfter(20);
+        table3.setWidths(new float[]{3.5f, 1, 1, 1});
 
         title = messageSource.getMessage("text.detalle.items.producto", null, locale);
-        table3.addCell(title);
+        table3.addCell(headerCell(title, 236, 240, 241));
 
         title = messageSource.getMessage("text.detalle.items.precio", null, locale);
-        table3.addCell(title);
+        table3.addCell(headerCell(title, 236, 240, 241));
 
         title = messageSource.getMessage("text.detalle.items.cantidad", null, locale);
-        table3.addCell(title);
+        table3.addCell(headerCell(title, 236, 240, 241));
 
         title = messageSource.getMessage("text.detalle.items.total", null, locale);
-        table3.addCell(title);
+        table3.addCell(headerCell(title, 236, 240, 241));
 
         // recorremos cada item
         for (ItemFactura item : factura.getItems()) {
             table3.addCell(item.getProduct().getName());
             table3.addCell(item.getProduct().getPrecio().toString());
 
-            cell = new PdfPCell(new Phrase(item.getCantidad().toString()));
-            cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-            table3.addCell(cell);
+            PdfPCell cell4 = new PdfPCell(new Phrase(item.getCantidad().toString()));
+            cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+            table3.addCell(cell4);
             table3.addCell(item.calcularImporte().toString());
         }
 
         // footer
-        PdfPCell cell1 = new PdfPCell(new Phrase("Subtotal "));
-        cell1.setColspan(3);
-        cell1.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
-        table3.addCell(cell1);
+//        PdfPCell cell1 = new PdfPCell(new Phrase("Subtotal "));
+//        cell1.setColspan(3);
+//        cell1.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
+//        table3.addCell(cell1);
+        table3.addCell(footerCell("Subtotal ", 255, 255, 255, 2));
         table3.addCell(factura.getSubtotal().toString());
 
-        PdfPCell cell2 = new PdfPCell(new Phrase("I.V.A 12% "));
-        cell2.setColspan(3);
-        cell2.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
-        table3.addCell(cell2);
+
+        table3.addCell(footerCell("I.V.A 12% ", 255, 255, 255, 2));
         table3.addCell(factura.getIva().toString());
 
-        PdfPCell cell3 = new PdfPCell(new Phrase("Total a pagar "));
-        cell3.setColspan(3);
-        cell3.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
-        table3.addCell(cell3);
-        table3.addCell(factura.getTotal().toString());
+
+        table3.addCell(footerCell("Total a pagar", 254, 164, 127, 2));
+        String totalPagar = factura.getTotal().toString();
+        table3.addCell(footerCell(totalPagar, 254, 164, 127, 3));
+
 
         document.add(table3);
-
-
     }
 
 }
-//see video 7
