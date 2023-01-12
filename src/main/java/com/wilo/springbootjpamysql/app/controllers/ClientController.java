@@ -169,10 +169,8 @@ public class ClientController {
         PageRender<Client> pageRender = new PageRender<>("/list", clientPage);
 
         model.addAttribute("title",
-                messageSource
-                        .getMessage("text.clientController.listar.titulo",
-                                null,
-                                locale));
+                messageSource.getMessage("text.clientController.listar.titulo",
+                        null, locale));
         model.addAttribute("clients", clientPage);
         model.addAttribute("page", pageRender);
 //        model.addAttribute("clients", clientService.findAll());

@@ -68,11 +68,11 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(localeChangeInterceptor());
     }
 
-    // configuracion para xml
+    // configuracion convertir un objeto a xml
     @Bean
     public Jaxb2Marshaller jaxb2Marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setClassesToBeBound();
+        marshaller.setClassesToBeBound(com.wilo.springbootjpamysql.app.view.xml.ClientList.class);
         return marshaller;
     }
 }
