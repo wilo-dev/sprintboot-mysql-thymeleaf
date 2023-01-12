@@ -14,6 +14,8 @@
 
     <div class="my-2">
         <a sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-success" th:href="@{/form}">Crear Clientes</a>
+        <a class="btn btn-success btn-xs float-right mx-2"
+           th:href="@{'/list'(format=csv)}">CSV</a>
     </div>
     <table class="table">
         <thead class="thead-light">
