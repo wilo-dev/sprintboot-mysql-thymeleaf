@@ -46,7 +46,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/css/**",
                         "/js/**",
                         "/img/**",
-                        "/list",
+                        "/list**",
+                        "/api/client/**",
                         "/locale").permitAll()
                 // private routes
                 // seguridad a controladores mediante forma programatica

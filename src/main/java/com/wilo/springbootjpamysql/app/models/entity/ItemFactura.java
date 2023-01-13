@@ -1,5 +1,7 @@
 package com.wilo.springbootjpamysql.app.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -13,7 +15,9 @@ public class ItemFactura implements Serializable {
     private Long id;
     private Integer cantidad;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    //    @ManyToOne(fetch = FetchType.EAGER) // carga all data
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne(fetch = FetchType.LAZY) // caraga perezosa
     @JoinColumn(name = "product_id")
     private Product product;
 

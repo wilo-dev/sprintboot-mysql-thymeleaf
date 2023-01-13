@@ -1,5 +1,7 @@
 package com.wilo.springbootjpamysql.app.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.xml.bind.annotation.XmlTransient;
@@ -21,6 +23,7 @@ public class Factura implements Serializable {
     private String observacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference // se omite el client
     private Client client;
 
     @Column(name = "create_at")

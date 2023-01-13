@@ -8,6 +8,7 @@ import com.wilo.springbootjpamysql.app.models.services.IClientService;
 import com.wilo.springbootjpamysql.app.models.services.uploadImg.IUploadsService;
 import com.wilo.springbootjpamysql.app.util.pagination.PageRender;
 
+import com.wilo.springbootjpamysql.app.view.xml.ClientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -116,6 +118,18 @@ public class ClientController {
                                    GET LIST
    ================================================================================
    ***/
+
+//    @GetMapping("/list-rest")
+//    public @ResponseBody List<Client> listJson() {
+//        return clientService.findAll();
+//    }
+
+    @GetMapping("/list-rest")
+    public @ResponseBody ClientList listJsonAndXml() {
+        return new ClientList(clientService.findAll());
+    }
+
+
     @GetMapping({"/", "/list"})
     public String list(@RequestParam(name = "page", defaultValue = "0") int page,
                        Model model, Authentication authentication,
